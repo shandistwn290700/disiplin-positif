@@ -1,0 +1,16 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class SiteSetting extends Model
+{
+    protected $fillable = ['hero_image', 'favicon', 'welcome_message'];
+
+    // Selalu ambil (atau buat) satu baris pengaturan saja — aplikasi ini cuma butuh 1 set pengaturan global
+    public static function current(): self
+    {
+        return static::firstOrCreate(['id' => 1]);
+    }
+}
