@@ -3,15 +3,7 @@
 @section('content')
     <h1 class="text-xl font-bold mb-4">Ubah Kelas</h1>
 
-    @if($errors->any())
-        <div class="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">
-            <ul class="list-disc pl-5">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    <x-validation-errors />
 
     <form method="POST" action="{{ route('classes.update', $class) }}" class="bg-white shadow rounded p-6 space-y-4">
         @csrf

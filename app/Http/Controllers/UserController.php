@@ -6,6 +6,7 @@ use App\Models\SchoolClass;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 // Semua method dibatasi middleware role:admin di routes/web.php
 class UserController extends Controller
@@ -38,7 +39,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => ['required', 'confirmed', Password::defaults()],
             'role' => ['required', 'in:admin,guru'],
             'class_id' => ['nullable', 'required_if:role,guru', 'exists:classes,id'],
         ]);
@@ -54,6 +55,7 @@ class UserController extends Controller
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
             'class_id' => $validated['class_id'] ?? null,
+            'must_change_password' => true, // wajib ganti password sendiri saat login pertama kali
         ]);
 
         return redirect()->route('users.index')->with('success', 'Akun berhasil dibuat.');
@@ -83,7 +85,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email,' . $user->id],
-            'password' => ['nullable', 'string', 'min:8'],
+            'password' => ['nullable', 'confirmed', Password::defaults()],
             'role' => ['required', 'in:admin,guru'],
             'class_id' => ['nullable', 'required_if:role,guru', 'exists:classes,id'],
         ]);
@@ -100,6 +102,8 @@ class UserController extends Controller
         // Password hanya diganti kalau diisi; kalau dikosongkan, password lama tetap dipakai
         if (!empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
+            // Admin baru saja mengganti password user ini (reset), wajibkan dia ganti sendiri lagi
+            $user->must_change_password = true;
         }
 
         $user->save();

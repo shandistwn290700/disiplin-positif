@@ -29,38 +29,44 @@ class ReportController extends Controller
      */
     public function exportExcel(Request $request)
     {
-        $students = $this->rekapPoinQuery($request->user(), $request)->get();
+        try {
+            $students = $this->rekapPoinQuery($request->user(), $request)->get();
 
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Rekap Poin');
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->setTitle('Rekap Poin');
 
-        $sheet->fromArray(['Nama', 'Kelas', 'Total Poin'], null, 'A1');
-        $sheet->getStyle('A1:C1')->getFont()->setBold(true);
+            $sheet->fromArray(['Nama', 'Kelas', 'Total Poin'], null, 'A1');
+            $sheet->getStyle('A1:C1')->getFont()->setBold(true);
 
-        $row = 2;
-        foreach ($students as $student) {
-            $sheet->setCellValue("A{$row}", $student->name);
-            $sheet->setCellValue("B{$row}", $student->schoolClass->name ?? '-');
-            $sheet->setCellValueExplicit(
-                "C{$row}",
-                $student->total_points,
-                \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC
-            );
-            $row++;
+            $row = 2;
+            foreach ($students as $student) {
+                $sheet->setCellValue("A{$row}", $student->name);
+                $sheet->setCellValue("B{$row}", $student->schoolClass->name ?? '-');
+                $sheet->setCellValueExplicit(
+                    "C{$row}",
+                    $student->total_points,
+                    \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC
+                );
+                $row++;
+            }
+
+            foreach (['A', 'B', 'C'] as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+
+            $filename = 'laporan-rekap-poin-' . now()->format('Y-m-d') . '.xlsx';
+
+            return response()->streamDownload(function () use ($spreadsheet) {
+                (new Xlsx($spreadsheet))->save('php://output');
+            }, $filename, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->with('error', 'Gagal membuat file Excel. Silakan coba lagi.');
         }
-
-        foreach (['A', 'B', 'C'] as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
-
-        $filename = 'laporan-rekap-poin-' . now()->format('Y-m-d') . '.xlsx';
-
-        return response()->streamDownload(function () use ($spreadsheet) {
-            (new Xlsx($spreadsheet))->save('php://output');
-        }, $filename, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ]);
     }
 
     /**
@@ -68,16 +74,22 @@ class ReportController extends Controller
      */
     public function exportPdf(Request $request)
     {
-        $students = $this->rekapPoinQuery($request->user(), $request)->get();
+        try {
+            $students = $this->rekapPoinQuery($request->user(), $request)->get();
 
-        $pdf = Pdf::loadView('reports.pdf', [
-            'students' => $students,
-            'generatedAt' => now(),
-        ])->setPaper('a4', 'portrait');
+            $pdf = Pdf::loadView('reports.pdf', [
+                'students' => $students,
+                'generatedAt' => now(),
+            ])->setPaper('a4', 'portrait');
 
-        $filename = 'laporan-rekap-poin-' . now()->format('Y-m-d') . '.pdf';
+            $filename = 'laporan-rekap-poin-' . now()->format('Y-m-d') . '.pdf';
 
-        return $pdf->download($filename);
+            return $pdf->download($filename);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->with('error', 'Gagal membuat file PDF. Silakan coba lagi.');
+        }
     }
 
     /**

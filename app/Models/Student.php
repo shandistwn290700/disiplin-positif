@@ -18,6 +18,11 @@ class Student extends Model
         return $this->hasMany(DisciplineRecord::class);
     }
 
+    public function summonLetters()
+    {
+        return $this->hasMany(SummonLetter::class);
+    }
+
     // Total poin siswa = jumlah semua poin dari record (positif menambah, negatif mengurangi)
     public function totalPoints(): int
     {

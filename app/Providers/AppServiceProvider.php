@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Aturan kekuatan password default untuk SELURUH aplikasi (dipakai lewat Password::defaults()).
+        // Minimal 8 karakter, wajib ada huruf besar+kecil, angka, dan simbol.
+        Password::defaults(function () {
+            return Password::min(8)->mixedCase()->numbers()->symbols();
+        });
     }
 }

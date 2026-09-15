@@ -32,43 +32,49 @@ class DisciplineRecordController extends Controller
      */
     public function exportExcel(Request $request)
     {
-        $records = $this->visibleRecordsQuery($request->user(), $request)->get();
+        try {
+            $records = $this->visibleRecordsQuery($request->user(), $request)->get();
 
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Catatan Disiplin');
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->setTitle('Catatan Disiplin');
 
-        $headers = ['Tanggal', 'Siswa', 'Kode', 'Kategori', 'Tingkat', 'Poin', 'Dicatat Oleh'];
-        $sheet->fromArray($headers, null, 'A1');
-        $sheet->getStyle('A1:G1')->getFont()->setBold(true);
+            $headers = ['Tanggal', 'Siswa', 'Kode', 'Kategori', 'Tingkat', 'Poin', 'Dicatat Oleh'];
+            $sheet->fromArray($headers, null, 'A1');
+            $sheet->getStyle('A1:G1')->getFont()->setBold(true);
 
-        $row = 2;
-        foreach ($records as $record) {
-            $sheet->setCellValue("A{$row}", $record->date->format('d M Y'));
-            $sheet->setCellValue("B{$row}", $record->student->name);
-            $sheet->setCellValue("C{$row}", $record->category->code ?? '-');
-            $sheet->setCellValue("D{$row}", $record->category->name ?? '-');
-            $sheet->setCellValue("E{$row}", $record->category->severityLabel() ?? '-');
-            $sheet->setCellValueExplicit(
-                "F{$row}",
-                $record->category->points ?? 0,
-                \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC
-            );
-            $sheet->setCellValue("G{$row}", $record->recordedBy->name ?? '-');
-            $row++;
+            $row = 2;
+            foreach ($records as $record) {
+                $sheet->setCellValue("A{$row}", $record->date->format('d M Y'));
+                $sheet->setCellValue("B{$row}", $record->student->name);
+                $sheet->setCellValue("C{$row}", $record->category->code ?? '-');
+                $sheet->setCellValue("D{$row}", $record->category->name ?? '-');
+                $sheet->setCellValue("E{$row}", $record->category->severityLabel() ?? '-');
+                $sheet->setCellValueExplicit(
+                    "F{$row}",
+                    $record->category->points ?? 0,
+                    \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC
+                );
+                $sheet->setCellValue("G{$row}", $record->recordedBy->name ?? '-');
+                $row++;
+            }
+
+            foreach (['A', 'B', 'C', 'D', 'E', 'F', 'G'] as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+
+            $filename = 'catatan-disiplin-' . ($request->filled('month') ? $request->month : now()->format('Y-m-d')) . '.xlsx';
+
+            return response()->streamDownload(function () use ($spreadsheet) {
+                (new Xlsx($spreadsheet))->save('php://output');
+            }, $filename, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->with('error', 'Gagal membuat file Excel. Silakan coba lagi.');
         }
-
-        foreach (['A', 'B', 'C', 'D', 'E', 'F', 'G'] as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
-
-        $filename = 'catatan-disiplin-' . ($request->filled('month') ? $request->month : now()->format('Y-m-d')) . '.xlsx';
-
-        return response()->streamDownload(function () use ($spreadsheet) {
-            (new Xlsx($spreadsheet))->save('php://output');
-        }, $filename, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ]);
     }
 
     /**
@@ -76,16 +82,22 @@ class DisciplineRecordController extends Controller
      */
     public function exportPdf(Request $request)
     {
-        $records = $this->visibleRecordsQuery($request->user(), $request)->get();
+        try {
+            $records = $this->visibleRecordsQuery($request->user(), $request)->get();
 
-        $pdf = Pdf::loadView('records.pdf', [
-            'records' => $records,
-            'generatedAt' => now(),
-        ])->setPaper('a4', 'landscape');
+            $pdf = Pdf::loadView('records.pdf', [
+                'records' => $records,
+                'generatedAt' => now(),
+            ])->setPaper('a4', 'landscape');
 
-        $filename = 'catatan-disiplin-' . ($request->filled('month') ? $request->month : now()->format('Y-m-d')) . '.pdf';
+            $filename = 'catatan-disiplin-' . ($request->filled('month') ? $request->month : now()->format('Y-m-d')) . '.pdf';
 
-        return $pdf->download($filename);
+            return $pdf->download($filename);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->with('error', 'Gagal membuat file PDF. Silakan coba lagi.');
+        }
     }
 
     /**
@@ -151,7 +163,9 @@ class DisciplineRecordController extends Controller
             ->orderBy('students.name')
             ->get();
 
-        $categories = Category::orderBy('type')->orderBy('name')->get();
+        $categories = Category::all()->sort(function ($a, $b) {
+            return strnatcasecmp($a->code ?: $a->name, $b->code ?: $b->name);
+        })->values();
 
         return view('records.create', compact('students', 'categories'));
     }
@@ -162,7 +176,7 @@ class DisciplineRecordController extends Controller
             'student_id' => ['required', 'exists:students,id'],
             'category_id' => ['required', 'exists:categories,id'],
             'description' => ['nullable', 'string', 'max:1000'],
-            'date' => ['required', 'date'],
+            'date' => ['required', 'date', 'before_or_equal:today'],
         ]);
 
         $user = $request->user();

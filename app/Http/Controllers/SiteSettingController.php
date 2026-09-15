@@ -25,18 +25,24 @@ class SiteSettingController extends Controller
         $setting = SiteSetting::current();
         $updates = [];
 
-        if ($request->hasFile('hero_image')) {
-            if ($setting->hero_image) {
-                Storage::disk('public')->delete($setting->hero_image);
+        try {
+            if ($request->hasFile('hero_image')) {
+                if ($setting->hero_image) {
+                    Storage::disk('public')->delete($setting->hero_image);
+                }
+                $updates['hero_image'] = $request->file('hero_image')->store('hero', 'public');
             }
-            $updates['hero_image'] = $request->file('hero_image')->store('hero', 'public');
-        }
 
-        if ($request->hasFile('favicon')) {
-            if ($setting->favicon) {
-                Storage::disk('public')->delete($setting->favicon);
+            if ($request->hasFile('favicon')) {
+                if ($setting->favicon) {
+                    Storage::disk('public')->delete($setting->favicon);
+                }
+                $updates['favicon'] = $request->file('favicon')->store('favicon', 'public');
             }
-            $updates['favicon'] = $request->file('favicon')->store('favicon', 'public');
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->with('error', 'Gagal menyimpan file. Pastikan ukuran file tidak terlalu besar dan coba lagi.');
         }
 
         if (empty($updates)) {
@@ -57,5 +63,23 @@ class SiteSettingController extends Controller
         SiteSetting::current()->update($validated);
 
         return redirect()->route('settings.edit')->with('success', 'Pesan selamat datang berhasil diperbarui.');
+    }
+
+    public function updateSchoolIdentity(Request $request)
+    {
+        $validated = $request->validate([
+            'school_government_line' => ['nullable', 'string', 'max:255'],
+            'school_name' => ['nullable', 'string', 'max:255'],
+            'school_address' => ['nullable', 'string', 'max:255'],
+            'school_email' => ['nullable', 'email', 'max:255'],
+            'school_city' => ['nullable', 'string', 'max:100'],
+            'waka_kesiswaan_name' => ['nullable', 'string', 'max:255'],
+            'principal_name' => ['nullable', 'string', 'max:255'],
+            'summon_letter_threshold' => ['required', 'integer', 'lt:0'],
+        ]);
+
+        SiteSetting::current()->update($validated);
+
+        return redirect()->route('settings.edit')->with('success', 'Identitas sekolah berhasil diperbarui.');
     }
 }

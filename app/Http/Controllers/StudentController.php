@@ -102,10 +102,16 @@ class StudentController extends Controller
             'excel_file' => ['required', 'file', 'mimes:xlsx,xls,csv'],
         ]);
 
-        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($validated['excel_file']->getRealPath());
-        $sheet = $spreadsheet->getActiveSheet();
-        // toArray dengan key kolom huruf (A, B, C, ...) supaya urutan kolom jelas dibaca
-        $rows = $sheet->toArray(null, true, true, true);
+        try {
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($validated['excel_file']->getRealPath());
+            $sheet = $spreadsheet->getActiveSheet();
+            // toArray dengan key kolom huruf (A, B, C, ...) supaya urutan kolom jelas dibaca
+            $rows = $sheet->toArray(null, true, true, true);
+        } catch (\Throwable $e) {
+            report($e); // tetap dicatat ke log untuk keperluan debugging
+
+            return back()->with('error', 'File tidak bisa dibaca. Pastikan file Excel/CSV tidak rusak dan formatnya sesuai contoh.');
+        }
 
         $classes = SchoolClass::all();
 

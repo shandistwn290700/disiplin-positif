@@ -10,7 +10,13 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::orderBy('type')->orderBy('severity')->orderBy('name')->get();
+        // Natural sort berdasarkan kode: huruf diurutkan alfabet, angka diurutkan dari yang
+        // terkecil (bukan diurutkan sebagai teks biasa, supaya "P-2" tidak muncul setelah "P-10").
+        // Kalau kode kosong, jatuh ke nama sebagai gantinya.
+        $categories = Category::all()->sort(function ($a, $b) {
+            return strnatcasecmp($a->code ?: $a->name, $b->code ?: $b->name);
+        })->values();
+
         return view('categories.index', compact('categories'));
     }
 

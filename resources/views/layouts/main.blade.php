@@ -147,10 +147,11 @@
                         </span>
                         <svg id="chev-grp-pencatatan" class="chevron w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                     </div>
-                    <div id="grp-pencatatan" class="sidebar-submenu {{ request()->routeIs('records.*') || request()->routeIs('reports.*') ? 'open' : '' }}">
+                    <div id="grp-pencatatan" class="sidebar-submenu {{ request()->routeIs('records.*') || request()->routeIs('reports.*') || request()->routeIs('summon.*') ? 'open' : '' }}">
                         <a href="{{ route('records.create') }}" class="{{ request()->routeIs('records.create') ? 'active' : '' }}">Catat Perilaku</a>
                         <a href="{{ route('records.index') }}" class="{{ request()->routeIs('records.index') ? 'active' : '' }}">Riwayat Catatan</a>
                         <a href="{{ route('reports.index') }}" class="{{ request()->routeIs('reports.*') ? 'active' : '' }}">Poin Siswa</a>
+                        <a href="{{ route('summon.index') }}" class="{{ request()->routeIs('summon.*') ? 'active' : '' }}">Pemanggilan</a>
                     </div>
                 </div>
 

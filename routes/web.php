@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ForcePasswordController;
+use App\Http\Controllers\SummonLetterController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SiteSettingController;
 use App\Http\Controllers\SchoolClassController;
@@ -19,13 +21,23 @@ Route::get('/', function () {
 // Route dashboard bawaan Breeze diganti agar langsung redirect ke halaman catatan
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'force-password'])->group(function () {
+
+    Route::get('/ganti-password', [ForcePasswordController::class, 'edit'])->name('force-password.edit');
+    Route::post('/ganti-password', [ForcePasswordController::class, 'update'])->name('force-password.update');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Formulir disiplin — admin & guru (data yang terlihat dibatasi di controller)
     Route::middleware('role:admin,guru')->group(function () {
+
+        Route::get('/pemanggilan', [SummonLetterController::class, 'index'])->name('summon.index'); 
+        Route::get('/pemanggilan/{student}/buat', [SummonLetterController::class, 'create'])->name('summon.create'); 
+        Route::post('/pemanggilan/{student}/buat', [SummonLetterController::class, 'store'])->name('summon.store'); 
+        Route::get('/pemanggilan/surat/{letter}', [SummonLetterController::class, 'pdf'])->name('summon.pdf');
+
         Route::get('/records', [DisciplineRecordController::class, 'index'])->name('records.index');
         Route::get('/records/export/excel', [DisciplineRecordController::class, 'exportExcel'])->name('records.export.excel');
         Route::get('/records/export/pdf', [DisciplineRecordController::class, 'exportPdf'])->name('records.export.pdf');
@@ -47,6 +59,8 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/settings/welcome-message', [SiteSettingController::class, 'updateWelcomeMessage'])->name('settings.welcome-message');        
 
+
+        Route::post('/settings/identitas-sekolah', [SiteSettingController::class, 'updateSchoolIdentity'])->name('settings.school-identity');
         Route::get('/classes', [SchoolClassController::class, 'index'])->name('classes.index'); 
         Route::get('/classes/create', [SchoolClassController::class, 'create'])->name('classes.create'); 
         Route::post('/classes', [SchoolClassController::class, 'store'])->name('classes.store'); 

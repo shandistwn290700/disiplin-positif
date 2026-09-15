@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\SchoolClass;
+use App\Models\SiteSetting;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -61,5 +62,16 @@ class DatabaseSeeder extends Seeder
         foreach ($categories as $category) {
             Category::create($category);
         }
+
+        SiteSetting::current()->update([
+            'school_government_line' => 'Pemerintah Kabupaten Bandung',
+            'school_name' => 'SDIT Bahtera Nuh',
+            'school_address' => 'Jl. Gandasoli Kidul No. 42 Gandasari Katapang Bandung 40921',
+            'school_email' => 'sditbahteranuh@gmail.com',
+            'school_city' => 'Katapang',
+            'waka_kesiswaan_name' => 'Fatahilah, S.Pd., Gr.',
+            'principal_name' => 'Shopan Awaludin, S.Pd',
+            'summon_letter_threshold' => -100,
+        ]);
     }
 }
