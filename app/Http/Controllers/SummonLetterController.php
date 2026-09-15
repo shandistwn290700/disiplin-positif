@@ -54,8 +54,8 @@ class SummonLetterController extends Controller
     public function create(Request $request, Student $student)
     {
         $user = $request->user();
-        if (!$user->isAdmin() && $student->class_id !== $user->class_id) {
-            abort(403, 'Anda hanya dapat membuat surat untuk siswa di kelas Anda sendiri.');
+        if (!$user->isAdmin()) {
+            abort(403, 'Hanya admin yang dapat membuat surat pemanggilan.');
         }
 
         return view('summon-letters.create', [
@@ -67,8 +67,8 @@ class SummonLetterController extends Controller
     public function store(Request $request, Student $student)
     {
         $user = $request->user();
-        if (!$user->isAdmin() && $student->class_id !== $user->class_id) {
-            abort(403, 'Anda hanya dapat membuat surat untuk siswa di kelas Anda sendiri.');
+        if (!$user->isAdmin()) {
+            abort(403, 'Hanya admin yang dapat membuat surat pemanggilan.');
         }
 
         $validated = $request->validate([
