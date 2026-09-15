@@ -19,6 +19,9 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
+        //force buat https
+    if (config('app.env') === 'production') { \URL::forceScheme('https'); }
+    
     {
         // Aturan kekuatan password default untuk SELURUH aplikasi (dipakai lewat Password::defaults()).
         // Minimal 8 karakter, wajib ada huruf besar+kecil, angka, dan simbol.
