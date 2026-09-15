@@ -33,9 +33,8 @@ Route::middleware(['auth', 'force-password'])->group(function () {
     // Formulir disiplin — admin & guru (data yang terlihat dibatasi di controller)
     Route::middleware('role:admin,guru')->group(function () {
 
-        Route::get('/pemanggilan', [SummonLetterController::class, 'index'])->name('summon.index'); 
-        Route::get('/pemanggilan/{student}/buat', [SummonLetterController::class, 'create'])->name('summon.create'); 
-        Route::post('/pemanggilan/{student}/buat', [SummonLetterController::class, 'store'])->name('summon.store'); 
+        // Guru hanya boleh melihat antrian & riwayat surat (dibatasi ke kelasnya sendiri di controller)
+        Route::get('/pemanggilan', [SummonLetterController::class, 'index'])->name('summon.index');
         Route::get('/pemanggilan/surat/{letter}', [SummonLetterController::class, 'pdf'])->name('summon.pdf');
 
         Route::get('/records', [DisciplineRecordController::class, 'index'])->name('records.index');
@@ -56,6 +55,10 @@ Route::middleware(['auth', 'force-password'])->group(function () {
 
     // Manajemen data siswa — khusus admin
     Route::middleware('role:admin')->group(function () {
+
+        // Generate surat pemanggilan — khusus admin
+        Route::get('/pemanggilan/{student}/buat', [SummonLetterController::class, 'create'])->name('summon.create');
+        Route::post('/pemanggilan/{student}/buat', [SummonLetterController::class, 'store'])->name('summon.store');
 
         Route::post('/settings/welcome-message', [SiteSettingController::class, 'updateWelcomeMessage'])->name('settings.welcome-message');        
 
