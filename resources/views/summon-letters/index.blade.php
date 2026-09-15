@@ -35,9 +35,13 @@
                         <td>{{ $item['student']->schoolClass->name }}</td>
                         <td class="font-semibold text-red-600">{{ $item['total_points'] }}</td>
                         <td>
-                            <a href="{{ route('summon.create', $item['student']) }}" class="btn-primary btn-sm">
-                                Buat Surat
-                            </a>
+                            @if(auth()->user()->isAdmin())
+                                <a href="{{ route('summon.create', $item['student']) }}" class="btn-primary btn-sm">
+                                    Buat Surat
+                                </a>
+                            @else
+                                <span class="text-gray-400 text-sm">Hanya admin</span>
+                            @endif
                         </td>
                     </tr>
                 @endforeach
