@@ -76,9 +76,37 @@ class SiteSettingController extends Controller
             'waka_kesiswaan_name' => ['nullable', 'string', 'max:255'],
             'principal_name' => ['nullable', 'string', 'max:255'],
             'summon_letter_threshold' => ['required', 'integer', 'lt:0'],
+            'government_logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
+            'school_logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:1024'],
         ]);
 
-        SiteSetting::current()->update($validated);
+        $setting = SiteSetting::current();
+
+        try {
+            if ($request->hasFile('government_logo')) {
+                if ($setting->government_logo) {
+                    Storage::disk('public')->delete($setting->government_logo);
+                }
+                $validated['government_logo'] = $request->file('government_logo')->store('logo', 'public');
+            } else {
+                unset($validated['government_logo']);
+            }
+
+            if ($request->hasFile('school_logo')) {
+                if ($setting->school_logo) {
+                    Storage::disk('public')->delete($setting->school_logo);
+                }
+                $validated['school_logo'] = $request->file('school_logo')->store('logo', 'public');
+            } else {
+                unset($validated['school_logo']);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->with('error', 'Gagal mengunggah logo. Silakan coba lagi.');
+        }
+
+        $setting->update($validated);
 
         return redirect()->route('settings.edit')->with('success', 'Identitas sekolah berhasil diperbarui.');
     }
