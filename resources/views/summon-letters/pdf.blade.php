@@ -10,11 +10,15 @@
             color: #111827;
             line-height: 1.5;
         }
-        .kop { text-align: center; }
-        .kop .baris1 { font-size: 12px; font-weight: bold; }
-        .kop .baris2 { font-size: 16px; font-weight: bold; letter-spacing: 2px; }
-        .kop .baris3 { font-size: 11px; }
-        .kop .baris4 { font-size: 11px; }
+        .kop-table { width: 100%; margin-bottom: 0; }
+        .kop-table td { border: none; padding: 0; vertical-align: middle; }
+        .kop-table .logo-col { width: 85px; text-align: center; }
+        .kop-table .logo-col img { max-width: 75px; max-height: 75px; }
+        .kop-table .text-col { text-align: center; }
+        .text-col .baris1 { font-size: 12px; font-weight: bold; }
+        .text-col .baris2 { font-size: 16px; font-weight: bold; letter-spacing: 2px; }
+        .text-col .baris3 { font-size: 11px; }
+        .text-col .baris4 { font-size: 11px; }
         .garis-tebal { border-top: 3px solid #111827; margin-top: 4px; }
         .garis-tipis { border-top: 1px solid #111827; margin-top: 1px; margin-bottom: 14px; }
 
@@ -41,18 +45,32 @@
 <body>
 
     {{-- Kop surat --}}
-    <div class="kop">
-        @if($setting->school_government_line)
-            <div class="baris1">{{ strtoupper($setting->school_government_line) }}</div>
-        @endif
-        <div class="baris2">{{ strtoupper($setting->school_name ?? 'NAMA SEKOLAH') }}</div>
-        @if($setting->school_address)
-            <div class="baris3">{{ $setting->school_address }}</div>
-        @endif
-        @if($setting->school_email)
-            <div class="baris4">Pos-el : {{ $setting->school_email }}</div>
-        @endif
-    </div>
+    <table class="kop-table">
+        <tr>
+            <td class="logo-col">
+                @if($setting->government_logo)
+                    <img src="{{ public_path('storage/' . $setting->government_logo) }}" alt="Logo Pemerintah">
+                @endif
+            </td>
+            <td class="text-col">
+                @if($setting->school_government_line)
+                    <div class="baris1">{{ strtoupper($setting->school_government_line) }}</div>
+                @endif
+                <div class="baris2">{{ strtoupper($setting->school_name ?? 'NAMA SEKOLAH') }}</div>
+                @if($setting->school_address)
+                    <div class="baris3">{{ $setting->school_address }}</div>
+                @endif
+                @if($setting->school_email)
+                    <div class="baris4">Pos-el : {{ $setting->school_email }}</div>
+                @endif
+            </td>
+            <td class="logo-col">
+                @if($setting->school_logo)
+                    <img src="{{ public_path('storage/' . $setting->school_logo) }}" alt="Logo Sekolah">
+                @endif
+            </td>
+        </tr>
+    </table>
     <div class="garis-tebal"></div>
     <div class="garis-tipis"></div>
 
