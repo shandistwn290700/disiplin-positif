@@ -3,7 +3,15 @@
 @section('content')
     <h1 class="text-xl font-bold mb-4">Pengaturan Tampilan</h1>
 
-    <x-validation-errors />
+    @if($errors->any())
+        <div class="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">
+            <ul class="list-disc pl-5">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     {{-- Gambar Hero --}}
     <div class="bg-white shadow rounded p-6 mb-6">
@@ -91,8 +99,26 @@
             Data ini dipakai untuk kop surat &amp; tanda tangan pada Surat Pemanggilan Orang Tua yang dibuat otomatis.
         </p>
 
-        <form method="POST" action="{{ route('settings.school-identity') }}" class="space-y-4">
+        <form method="POST" action="{{ route('settings.school-identity') }}" enctype="multipart/form-data" class="space-y-4">
             @csrf
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Logo Pemerintah/Kabupaten (kiri kop surat)</label>
+                    @if($setting->government_logo)
+                        <img src="{{ asset('storage/' . $setting->government_logo) }}" alt="Logo Pemerintah" class="w-16 h-16 object-contain border rounded mb-2">
+                    @endif
+                    <input type="file" name="government_logo" accept="image/*" class="w-full border rounded p-2 text-sm">
+                    <p class="text-xs text-gray-500 mt-1">Ukuran ideal: 300x300px, persegi, latar transparan (PNG), maks 1MB.</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Logo Sekolah (kanan kop surat)</label>
+                    @if($setting->school_logo)
+                        <img src="{{ asset('storage/' . $setting->school_logo) }}" alt="Logo Sekolah" class="w-16 h-16 object-contain border rounded mb-2">
+                    @endif
+                    <input type="file" name="school_logo" accept="image/*" class="w-full border rounded p-2 text-sm">
+                    <p class="text-xs text-gray-500 mt-1">Ukuran ideal: 300x300px, persegi, latar transparan (PNG), maks 1MB.</p>
+                </div>
+            </div>
             <div>
                 <label class="block text-sm font-medium mb-1">Baris Pemerintah (opsional)</label>
                 <input type="text" name="school_government_line" value="{{ old('school_government_line', $setting->school_government_line) }}"
