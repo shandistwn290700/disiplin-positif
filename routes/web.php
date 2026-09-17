@@ -14,9 +14,7 @@ use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', function () { if (auth()->check()) { return redirect()->route('dashboard'); } return view('welcome'); });
 
 // Route dashboard bawaan Breeze diganti agar langsung redirect ke halaman catatan
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
