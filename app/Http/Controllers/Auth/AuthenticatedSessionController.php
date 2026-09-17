@@ -31,7 +31,9 @@ class AuthenticatedSessionController extends Controller
         // Tandai sesi ini baru saja login, dipakai untuk menampilkan popup selamat datang sekali saja
         session()->flash('just_logged_in', true);
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Selalu arahkan ke Dashboard setelah login, BUKAN ke halaman terakhir yang sempat
+        // dibuka sebelum sesi habis (mengabaikan redirect()->intended() bawaan Laravel).
+        return redirect()->route('dashboard');
     }
 
     /**
