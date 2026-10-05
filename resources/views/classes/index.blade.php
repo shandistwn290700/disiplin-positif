@@ -1,36 +1,45 @@
 @extends('layouts.main')
 
 @section('content')
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
-        <h1 class="text-xl font-bold">Kelola Kelas</h1>
+    <x-page-header title="Kelola Kelas" subtitle="Daftar kelas dan jumlah siswanya.">
         <a href="{{ route('classes.create') }}" class="btn-primary btn-sm">
-            + Tambah Kelas
+            <x-icon name="plus" />
+            Tambah Kelas
         </a>
-    </div>
+    </x-page-header>
 
     <div class="table-scroll"><table class="table-fresh">
         <thead>
             <tr>
-                <th class="p-3 text-left">Nama Kelas</th>
-                <th class="p-3 text-left">Jumlah Siswa</th>
-                <th class="p-3"></th>
+                <th>Nama Kelas</th>
+                <th>Jumlah Siswa</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach($classes as $class)
-                <tr class="border-t">
-                    <td class="p-3">{{ $class->name }}</td>
-                    <td class="p-3">{{ $class->students_count }}</td>
-                    <td class="p-3 space-x-3">
-                        <a href="{{ route('classes.edit', $class) }}" class="btn-pill btn-pill-blue">Ubah</a>
+            @forelse($classes as $class)
+                <tr>
+                    <td>
+                        <span class="flex items-center gap-3">
+                            <span class="icon-tile !w-9 !h-9 !rounded-lg bg-brand-50 text-brand-600"><x-icon name="academic" /></span>
+                            <span class="cell-strong text-slate-900 font-semibold">{{ $class->name }}</span>
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge badge-gray tabular-nums">{{ $class->students_count }} siswa</span>
+                    </td>
+                    <td class="cell-actions">
+                        <a href="{{ route('classes.edit', $class) }}" class="btn-pill btn-pill-blue"><x-icon name="pencil" /> Ubah</a>
                         <form method="POST" action="{{ route('classes.destroy', $class) }}" class="inline"
                               onsubmit="return confirmDelete(this, 'Kelas ini akan dihapus permanen.')">
                             @csrf @method('DELETE')
-                            <button class="btn-pill btn-pill-red">Hapus</button>
+                            <button class="btn-pill btn-pill-red"><x-icon name="trash" /> Hapus</button>
                         </form>
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr><td colspan="3"><x-empty-state icon="academic">Belum ada kelas.</x-empty-state></td></tr>
+            @endforelse
         </tbody>
     </table></div>
 @endsection

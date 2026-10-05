@@ -1,49 +1,67 @@
 @extends('layouts.main')
 
 @section('content')
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
-        <h1 class="text-xl font-bold">Kelola Akun</h1>
+    <x-page-header title="Kelola Akun" subtitle="Akun admin dan guru yang dapat mengakses aplikasi.">
         <a href="{{ route('users.create') }}" class="btn-primary btn-sm">
-            + Buat Akun
+            <x-icon name="plus" />
+            Buat Akun
         </a>
-    </div>
-
+    </x-page-header>
 
     <div class="table-scroll"><table class="table-fresh">
         <thead>
             <tr>
-                <th class="p-3 text-left">Nama</th>
-                <th class="p-3 text-left">Email</th>
-                <th class="p-3 text-left">Role</th>
-                <th class="p-3 text-left">Kelas (wali)</th>
-                <th class="p-3"></th>
+                <th>Nama</th>
+                <th>Role</th>
+                <th>Kelas (wali)</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach($users as $user)
-                <tr class="border-t">
-                    <td class="p-3">{{ $user->name }}</td>
-                    <td class="p-3">{{ $user->email }}</td>
-                    <td class="p-3">
-                        <span class="{{ $user->role === 'admin' ? 'text-blue-600' : 'text-gray-600' }}">
+            @forelse($users as $user)
+                @php
+                    $initials = collect(preg_split('/\s+/', trim($user->name)))
+                        ->filter()->take(2)
+                        ->map(fn ($word) => mb_strtoupper(mb_substr($word, 0, 1)))
+                        ->implode('');
+                @endphp
+                <tr>
+                    <td>
+                        <span class="flex items-center gap-3">
+                            <span class="avatar">{{ $initials }}</span>
+                            <span class="min-w-0">
+                                <span class="block font-semibold text-slate-900">
+                                    {{ $user->name }}
+                                    @if($user->id === auth()->id())
+                                        <span class="ml-1 text-[0.7rem] font-medium text-slate-400">(Anda)</span>
+                                    @endif
+                                </span>
+                                <span class="block text-xs text-slate-500">{{ $user->email }}</span>
+                            </span>
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge {{ $user->role === 'admin' ? 'badge-blue' : 'badge-gray' }}">
                             {{ ucfirst($user->role) }}
                         </span>
                     </td>
-                    <td class="p-3">{{ $user->schoolClass->name ?? '-' }}</td>
-                    <td class="p-3 space-x-3">
-                        <a href="{{ route('users.edit', $user) }}" class="btn-pill btn-pill-blue">Ubah</a>
+                    <td class="cell-muted">{{ $user->schoolClass->name ?? '-' }}</td>
+                    <td class="cell-actions">
+                        <a href="{{ route('users.edit', $user) }}" class="btn-pill btn-pill-blue"><x-icon name="pencil" /> Ubah</a>
                         @if($user->id !== auth()->id())
                             <form method="POST" action="{{ route('users.destroy', $user) }}" class="inline"
                                   onsubmit="return confirmDelete(this, 'Akun ini akan dihapus permanen.')">
                                 @csrf @method('DELETE')
-                                <button class="btn-pill btn-pill-red">Hapus</button>
+                                <button class="btn-pill btn-pill-red"><x-icon name="trash" /> Hapus</button>
                             </form>
                         @endif
                     </td>
                 </tr>
-            @endforeach
+            @empty
+                <tr><td colspan="4"><x-empty-state icon="users">Belum ada akun.</x-empty-state></td></tr>
+            @endforelse
         </tbody>
     </table></div>
 
-    <div class="mt-4">{{ $users->links() }}</div>
+    <div class="mt-5">{{ $users->links() }}</div>
 @endsection

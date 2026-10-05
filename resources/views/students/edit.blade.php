@@ -1,35 +1,45 @@
 @extends('layouts.main')
 
 @section('content')
-    <h1 class="text-xl font-bold mb-4">Ubah Data Siswa</h1>
+    <x-page-header title="Ubah Data Siswa" :subtitle="$student->name" :back="route('students.index')" />
 
-    <x-validation-errors />
+    <div class="max-w-2xl">
+        <x-validation-errors />
 
-    <form method="POST" action="{{ route('students.update', $student) }}" class="bg-white shadow rounded p-6 space-y-4">
-        @csrf
-        @method('PUT')
+        <form method="POST" action="{{ route('students.update', $student) }}" class="card">
+            @csrf
+            @method('PUT')
 
-        <div>
-            <label class="block text-sm font-medium mb-1">NIS</label>
-            <input type="text" name="nis" value="{{ old('nis', $student->nis) }}" class="w-full border rounded p-2" required>
-        </div>
+            <div class="card-body space-y-5">
+                <div>
+                    <label class="form-label">NIS</label>
+                    <input type="text" name="nis" value="{{ old('nis', $student->nis) }}" class="form-control w-full sm:w-60" required>
+                </div>
 
-        <div>
-            <label class="block text-sm font-medium mb-1">Nama</label>
-            <input type="text" name="name" value="{{ old('name', $student->name) }}" class="w-full border rounded p-2" required>
-        </div>
+                <div>
+                    <label class="form-label">Nama</label>
+                    <input type="text" name="name" value="{{ old('name', $student->name) }}" class="form-control w-full" required>
+                </div>
 
-        <div>
-            <label class="block text-sm font-medium mb-1">Kelas</label>
-            <select name="class_id" class="w-full border rounded p-2" required>
-                @foreach($classes as $class)
-                    <option value="{{ $class->id }}" @selected(old('class_id', $student->class_id) == $class->id)>
-                        {{ $class->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+                <div>
+                    <label class="form-label">Kelas</label>
+                    <select name="class_id" class="form-control w-full" required>
+                        @foreach($classes as $class)
+                            <option value="{{ $class->id }}" @selected(old('class_id', $student->class_id) == $class->id)>
+                                {{ $class->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
 
-        <button type="submit" class="btn-primary w-full sm:w-auto">Simpan Perubahan</button>
-    </form>
+            <div class="card-footer flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+                <a href="{{ route('students.index') }}" class="btn-secondary w-full sm:w-auto">Batal</a>
+                <button type="submit" class="btn-primary w-full sm:w-auto">
+                    <x-icon name="check" />
+                    Simpan Perubahan
+                </button>
+            </div>
+        </form>
+    </div>
 @endsection

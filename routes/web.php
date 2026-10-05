@@ -16,10 +16,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () { if (auth()->check()) { return redirect()->route('dashboard'); } return view('welcome'); });
 
-// Route dashboard bawaan Breeze diganti agar langsung redirect ke halaman catatan
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
 Route::middleware(['auth', 'force-password'])->group(function () {
+
+    // Dashboard butuh user login (controller & layout memanggil $user->isAdmin())
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/ganti-password', [ForcePasswordController::class, 'edit'])->name('force-password.edit');
     Route::post('/ganti-password', [ForcePasswordController::class, 'update'])->name('force-password.update');

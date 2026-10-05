@@ -1,63 +1,77 @@
 @extends('layouts.main')
 
 @section('content')
-    <h1 class="text-xl font-bold mb-4">Ubah Akun</h1>
+    <x-page-header title="Ubah Akun" :subtitle="$user->name" :back="route('users.index')" />
 
-    <x-validation-errors />
+    <div class="max-w-2xl">
+        <x-validation-errors />
 
-    <form method="POST" action="{{ route('users.update', $user) }}" class="bg-white shadow rounded p-6 space-y-4">
-        @csrf
-        @method('PUT')
+        <form method="POST" action="{{ route('users.update', $user) }}" class="card">
+            @csrf
+            @method('PUT')
 
-        <div>
-            <label class="block text-sm font-medium mb-1">Nama</label>
-            <input type="text" name="name" value="{{ old('name', $user->name) }}" class="w-full border rounded p-2" required>
-        </div>
+            <div class="card-body space-y-5">
+                <div class="grid sm:grid-cols-2 gap-5">
+                    <div>
+                        <label class="form-label">Nama</label>
+                        <input type="text" name="name" value="{{ old('name', $user->name) }}" class="form-control w-full" required>
+                    </div>
 
-        <div>
-            <label class="block text-sm font-medium mb-1">Email</label>
-            <input type="email" name="email" value="{{ old('email', $user->email) }}" class="w-full border rounded p-2" required>
-        </div>
-
-        <div>
-            <label class="block text-sm font-medium mb-1">Password Baru (opsional)</label>
-            <input type="password" name="password" id="new-password" class="w-full border rounded p-2" minlength="8">
-            <div class="mt-2">
-                <div class="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-                    <div id="strength-bar" class="h-full w-0 transition-all duration-200 rounded-full"></div>
+                    <div>
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" value="{{ old('email', $user->email) }}" class="form-control w-full" required>
+                    </div>
                 </div>
-                <p id="strength-label" class="text-xs text-gray-500 mt-1">Kosongkan kalau tidak ingin mengganti password.</p>
+
+                <div>
+                    <label class="form-label">Password Baru <span class="font-normal text-slate-400">(opsional)</span></label>
+                    <input type="password" name="password" id="new-password" class="form-control w-full" minlength="8">
+                    <div class="mt-2.5">
+                        <div class="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
+                            <div id="strength-bar" class="h-full w-0 transition-all duration-200 rounded-full"></div>
+                        </div>
+                        <p id="strength-label" class="form-hint">Kosongkan kalau tidak ingin mengganti password.</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="form-label">Konfirmasi Password Baru</label>
+                    <input type="password" name="password_confirmation" class="form-control w-full" minlength="8">
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-5 pt-5 border-t border-slate-100">
+                    <div>
+                        <label class="form-label">Role</label>
+                        <select name="role" id="role" class="form-control w-full" required
+                                onchange="document.getElementById('class-wrapper').style.display = this.value === 'guru' ? 'block' : 'none'">
+                            <option value="guru" {{ old('role', $user->role) === 'guru' ? 'selected' : '' }}>Guru</option>
+                            <option value="admin" {{ old('role', $user->role) === 'admin' ? 'selected' : '' }}>Admin</option>
+                        </select>
+                    </div>
+
+                    <div id="class-wrapper">
+                        <label class="form-label">Kelas yang Diwalikan</label>
+                        <select name="class_id" class="form-control w-full">
+                            <option value="">-- Pilih Kelas --</option>
+                            @foreach($classes as $class)
+                                <option value="{{ $class->id }}" @selected(old('class_id', $user->class_id) == $class->id)>
+                                    {{ $class->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div>
-            <label class="block text-sm font-medium mb-1">Konfirmasi Password Baru</label>
-            <input type="password" name="password_confirmation" class="w-full border rounded p-2" minlength="8">
-        </div>
-
-        <div>
-            <label class="block text-sm font-medium mb-1">Role</label>
-            <select name="role" id="role" class="w-full border rounded p-2" required
-                    onchange="document.getElementById('class-wrapper').style.display = this.value === 'guru' ? 'block' : 'none'">
-                <option value="guru" {{ old('role', $user->role) === 'guru' ? 'selected' : '' }}>Guru</option>
-                <option value="admin" {{ old('role', $user->role) === 'admin' ? 'selected' : '' }}>Admin</option>
-            </select>
-        </div>
-
-        <div id="class-wrapper">
-            <label class="block text-sm font-medium mb-1">Kelas yang Diwalikan</label>
-            <select name="class_id" class="w-full border rounded p-2">
-                <option value="">-- Pilih Kelas --</option>
-                @foreach($classes as $class)
-                    <option value="{{ $class->id }}" @selected(old('class_id', $user->class_id) == $class->id)>
-                        {{ $class->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        <button type="submit" class="btn-primary w-full sm:w-auto">Simpan Perubahan</button>
-    </form>
+            <div class="card-footer flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+                <a href="{{ route('users.index') }}" class="btn-secondary w-full sm:w-auto">Batal</a>
+                <button type="submit" class="btn-primary w-full sm:w-auto">
+                    <x-icon name="check" />
+                    Simpan Perubahan
+                </button>
+            </div>
+        </form>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {

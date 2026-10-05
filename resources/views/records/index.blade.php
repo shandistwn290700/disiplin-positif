@@ -1,90 +1,84 @@
 @extends('layouts.main')
 
 @section('content')
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
-        <h1 class="text-xl font-bold">Catatan Disiplin</h1>
-        <div class="flex flex-wrap gap-2">
-            <a href="{{ route('records.export.excel') }}" class="btn-secondary btn-sm">
-                Export Excel
-            </a>
-            <a href="{{ route('records.export.pdf') }}" class="btn-secondary btn-sm">
-                Export PDF
-            </a>
-            <a href="{{ route('records.create') }}" class="btn-primary btn-sm">
-                + Tambah Catatan
-            </a>
-        </div>
-    </div>
+    <x-page-header title="Catatan Disiplin" subtitle="Riwayat seluruh catatan perilaku baik dan pelanggaran siswa.">
+        <a href="{{ route('records.export.excel') }}" class="btn-secondary btn-sm">
+            <x-icon name="download" class="text-emerald-600" />
+            Export Excel
+        </a>
+        <a href="{{ route('records.export.pdf') }}" class="btn-secondary btn-sm">
+            <x-icon name="document" class="text-red-600" />
+            Export PDF
+        </a>
+        <a href="{{ route('records.create') }}" class="btn-primary btn-sm">
+            <x-icon name="plus" />
+            Tambah Catatan
+        </a>
+    </x-page-header>
 
-    {{-- Filter kelas & pencarian nama siswa --}}
-    <form method="GET" action="{{ route('records.index') }}" class="bg-white shadow rounded p-4 mb-4 flex flex-wrap items-end gap-3">
-        @if(auth()->user()->isAdmin())
-            <div class="w-full sm:w-auto">
-                <label class="block text-xs font-medium text-gray-500 mb-1">Kelas</label>
-                <select name="class_id" class="w-full sm:w-auto border rounded p-2 text-sm">
-                    <option value="">Semua Kelas</option>
-                    @foreach($classes as $class)
-                        <option value="{{ $class->id }}" {{ (string) request('class_id') === (string) $class->id ? 'selected' : '' }}>
-                            {{ $class->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-        @endif
-
-        <div class="flex-1 min-w-[220px]">
-            <label class="block text-xs font-medium text-gray-500 mb-1">Cari Nama Siswa</label>
-            <input type="text" name="search" value="{{ request('search') }}"
-                   placeholder="Ketik nama siswa..." class="w-full border rounded p-2 text-sm">
-        </div>
-
-        <button type="submit" class="btn-primary btn-sm w-full sm:w-auto">Filter</button>
-
-        @if(request('class_id') || request('search'))
-            <a href="{{ route('records.index') }}" class="btn-secondary btn-sm w-full sm:w-auto">Reset</a>
-        @endif
-    </form>
+    @include('partials.filter-bar', ['action' => route('records.index')])
 
     <div class="table-scroll"><table class="table-fresh">
         <thead>
             <tr>
-                <th class="p-3 text-left">Tanggal</th>
-                <th class="p-3 text-left">Siswa</th>
-                <th class="p-3 text-left">Kode</th>
-                <th class="p-3 text-left">Kategori</th>
-                <th class="p-3 text-left">Tingkat</th>
-                <th class="p-3 text-left">Poin</th>
-                <th class="p-3 text-left">Dicatat oleh</th>
-                <th class="p-3"></th>
+                <th>Tanggal</th>
+                <th>Siswa</th>
+                <th>Kode</th>
+                <th>Kategori</th>
+                <th>Tingkat</th>
+                <th>Poin</th>
+                <th>Dicatat oleh</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             @forelse($records as $record)
-                <tr class="border-t">
-                    <td class="p-3">{{ $record->date->format('d M Y') }}</td>
-                    <td class="p-3">{{ $record->student->name }}</td>
-                    <td class="p-3">{{ $record->category->code ?? '-' }}</td>
-                    <td class="p-3">
-                        <span class="{{ $record->category->type === 'positif' ? 'text-green-600' : 'text-red-600' }}">
+                @php
+                    $isPositive = $record->category->type === 'positif';
+                    $severityBadge = ['ringan' => 'badge-amber', 'sedang' => 'badge-orange', 'berat' => 'badge-red'][$record->category->severity] ?? null;
+                @endphp
+                <tr>
+                    <td class="cell-muted whitespace-nowrap">{{ $record->date->format('d M Y') }}</td>
+                    <td class="cell-strong">{{ $record->student->name }}</td>
+                    <td>
+                        @if($record->category->code)
+                            <span class="badge-code">{{ $record->category->code }}</span>
+                        @else
+                            <span class="text-slate-300">—</span>
+                        @endif
+                    </td>
+                    <td>
+                        <span class="inline-flex items-center gap-2 {{ $isPositive ? 'text-emerald-700' : 'text-red-700' }}">
+                            <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 {{ $isPositive ? 'bg-emerald-500' : 'bg-red-500' }}"></span>
                             {{ $record->category->name }}
                         </span>
                     </td>
-                    <td class="p-3">{{ $record->category->severityLabel() ?? '-' }}</td>
-                    <td class="p-3">{{ $record->category->points > 0 ? '+' : '' }}{{ $record->category->points }}</td>
-                    <td class="p-3">{{ $record->recordedBy->name }}</td>
-                    <td class="p-3">
-                        <form method="POST" action="{{ route('records.destroy', $record) }}"
+                    <td>
+                        @if($severityBadge)
+                            <span class="badge {{ $severityBadge }}">{{ $record->category->severityLabel() }}</span>
+                        @else
+                            <span class="text-slate-300">—</span>
+                        @endif
+                    </td>
+                    <td>
+                        <span class="badge {{ $isPositive ? 'badge-green' : 'badge-red' }} tabular-nums">
+                            {{ $record->category->points > 0 ? '+' : '' }}{{ $record->category->points }}
+                        </span>
+                    </td>
+                    <td class="cell-muted whitespace-nowrap">{{ $record->recordedBy->name }}</td>
+                    <td class="cell-actions">
+                        <form method="POST" action="{{ route('records.destroy', $record) }}" class="inline"
                               onsubmit="return confirmDelete(this, 'Catatan ini akan dihapus permanen.')">
                             @csrf @method('DELETE')
-                            <button class="btn-pill btn-pill-red">Hapus</button>
+                            <button class="btn-pill btn-pill-red"><x-icon name="trash" /> Hapus</button>
                         </form>
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="8" class="p-4 text-center text-gray-400">Belum ada catatan.</td></tr>
+                <tr><td colspan="8"><x-empty-state icon="clipboard">Belum ada catatan.</x-empty-state></td></tr>
             @endforelse
         </tbody>
     </table></div>
 
-    <div class="mt-4">{{ $records->links() }}</div>
+    <div class="mt-5">{{ $records->links() }}</div>
 @endsection

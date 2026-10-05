@@ -1,168 +1,215 @@
 @extends('layouts.main')
 
 @section('content')
-    <h1 class="text-xl font-bold mb-4">Pengaturan Tampilan</h1>
+    <x-page-header title="Pengaturan Tampilan" subtitle="Atur gambar, ikon, pesan sambutan, dan identitas sekolah." />
 
-    @if($errors->any())
-        <div class="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">
-            <ul class="list-disc pl-5">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    <x-validation-errors />
 
-    {{-- Gambar Hero --}}
-    <div class="bg-white shadow rounded p-6 mb-6">
-        <h2 class="font-semibold mb-2">Gambar Hero (Halaman Depan)</h2>
-
-        <div class="bg-blue-50 text-blue-800 text-sm p-4 rounded mb-4">
-            <p class="font-medium">Ukuran yang direkomendasikan: 1200 x 1500 px (rasio 4:5)</p>
-            <p class="mt-1">Format JPG, PNG, atau WebP, maksimal 5MB.</p>
-        </div>
-
-        @if($setting->hero_image)
-            <div class="mb-4">
-                <p class="text-sm text-gray-600 mb-2">Gambar saat ini:</p>
-                <img src="{{ asset('storage/' . $setting->hero_image) }}" alt="Gambar hero saat ini" class="rounded-lg max-w-xs border">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+        {{-- Gambar Hero --}}
+        <div class="card flex flex-col">
+            <div class="card-header">
+                <span class="icon-tile bg-brand-50 text-brand-600"><x-icon name="photo" /></span>
+                <div>
+                    <h2 class="section-title">Gambar Hero (Halaman Depan)</h2>
+                    <p class="section-subtitle">Rekomendasi 1200 x 1500 px (rasio 4:5). JPG, PNG, atau WebP, maks 5MB.</p>
+                </div>
             </div>
-        @else
-            <p class="text-sm text-gray-500 mb-4">Belum ada gambar yang di-upload.</p>
-        @endif
 
-        <form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data" class="space-y-4">
-            @csrf
-            <div>
-                <label class="block text-sm font-medium mb-1">
-                    {{ $setting->hero_image ? 'Ganti dengan gambar baru' : 'Upload gambar' }}
-                </label>
-                <input type="file" name="hero_image" accept="image/*" class="w-full border rounded p-2">
+            <form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data" class="flex flex-col flex-1">
+                @csrf
+                <div class="card-body space-y-4 flex-1">
+                    @if($setting->hero_image)
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 mb-2">Gambar saat ini:</p>
+                            <img src="{{ asset('storage/' . $setting->hero_image) }}" alt="Gambar hero saat ini" class="rounded-xl max-h-56 border border-slate-200 shadow-sm">
+                        </div>
+                    @else
+                        <div class="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/60 p-6 text-center text-sm text-slate-400">
+                            Belum ada gambar yang di-upload.
+                        </div>
+                    @endif
+
+                    <div>
+                        <label class="form-label">
+                            {{ $setting->hero_image ? 'Ganti dengan gambar baru' : 'Upload gambar' }}
+                        </label>
+                        <input type="file" name="hero_image" accept="image/*" class="form-control w-full">
+                    </div>
+                </div>
+                <div class="card-footer flex justify-end">
+                    <button type="submit" class="btn-primary w-full sm:w-auto">Simpan Gambar Hero</button>
+                </div>
+            </form>
+        </div>
+
+        {{-- Favicon --}}
+        <div class="card flex flex-col">
+            <div class="card-header">
+                <span class="icon-tile bg-violet-50 text-violet-600"><x-icon name="sparkles" /></span>
+                <div>
+                    <h2 class="section-title">Favicon (Ikon Tab Browser)</h2>
+                    <p class="section-subtitle">Rekomendasi 512 x 512 px (persegi). PNG atau ICO, maks 1MB.</p>
+                </div>
             </div>
-            <button type="submit" class="btn-primary w-full sm:w-auto">Simpan Gambar Hero</button>
-        </form>
+
+            <form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data" class="flex flex-col flex-1">
+                @csrf
+                <div class="card-body space-y-4 flex-1">
+                    @if($setting->favicon)
+                        <div class="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/60 p-3">
+                            <img src="{{ asset('storage/' . $setting->favicon) }}" alt="Favicon saat ini" class="w-10 h-10 rounded-lg border border-slate-200 bg-white">
+                            <p class="text-sm text-slate-600">Favicon saat ini</p>
+                        </div>
+                    @else
+                        <div class="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/60 p-6 text-center text-sm text-slate-400">
+                            Belum ada favicon yang di-upload (memakai ikon default browser).
+                        </div>
+                    @endif
+
+                    <div>
+                        <label class="form-label">
+                            {{ $setting->favicon ? 'Ganti dengan favicon baru' : 'Upload favicon' }}
+                        </label>
+                        <input type="file" name="favicon" accept="image/png,image/x-icon" class="form-control w-full">
+                    </div>
+                </div>
+                <div class="card-footer flex justify-end">
+                    <button type="submit" class="btn-primary w-full sm:w-auto">Simpan Favicon</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    {{-- Favicon --}}
-    <div class="bg-white shadow rounded p-6">
-        <h2 class="font-semibold mb-2">Favicon (Ikon Tab Browser)</h2>
-
-        <div class="bg-blue-50 text-blue-800 text-sm p-4 rounded mb-4">
-            <p class="font-medium">Ukuran yang direkomendasikan: 512 x 512 px (persegi)</p>
-            <p class="mt-1">Format PNG atau ICO, maksimal 1MB. Ikon akan muncul di tab browser.</p>
-        </div>
-
-        @if($setting->favicon)
-            <div class="mb-4 flex items-center gap-3">
-                <p class="text-sm text-gray-600">Favicon saat ini:</p>
-                <img src="{{ asset('storage/' . $setting->favicon) }}" alt="Favicon saat ini" class="w-10 h-10 rounded border">
-            </div>
-        @else
-            <p class="text-sm text-gray-500 mb-4">Belum ada favicon yang di-upload (memakai ikon default browser).</p>
-        @endif
-
-        <form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data" class="space-y-4">
-            @csrf
-            <div>
-                <label class="block text-sm font-medium mb-1">
-                    {{ $setting->favicon ? 'Ganti dengan favicon baru' : 'Upload favicon' }}
-                </label>
-                <input type="file" name="favicon" accept="image/png,image/x-icon" class="w-full border rounded p-2">
-            </div>
-            <button type="submit" class="btn-primary w-full sm:w-auto">Simpan Favicon</button>
-        </form>
-    </div>
     {{-- Pesan Selamat Datang --}}
-    <div class="bg-white shadow rounded p-6 mt-6">
-        <h2 class="font-semibold mb-2">Pesan Selamat Datang Setelah Login</h2>
-        <p class="text-sm text-gray-500 mb-4">
-            Pesan ini muncul sebagai popup sekali setiap kali admin/guru berhasil login.
-            Kosongkan untuk memakai pesan default.
-        </p>
-
-        <form method="POST" action="{{ route('settings.welcome-message') }}" class="space-y-4">
-            @csrf
+    <div class="card mb-5">
+        <div class="card-header">
+            <span class="icon-tile bg-emerald-50 text-emerald-600"><x-icon name="chat" /></span>
             <div>
-                <label class="block text-sm font-medium mb-1">Pesan</label>
-                <textarea name="welcome_message" rows="3" maxlength="500"
-                          class="w-full border rounded p-2"
-                          placeholder="Contoh: Selamat datang kembali! Jangan lupa catat perkembangan siswa hari ini.">{{ old('welcome_message', $setting->welcome_message) }}</textarea>
+                <h2 class="section-title">Pesan Selamat Datang Setelah Login</h2>
+                <p class="section-subtitle">
+                    Pesan ini muncul sebagai popup sekali setiap kali admin/guru berhasil login.
+                    Kosongkan untuk memakai pesan default.
+                </p>
             </div>
-            <button type="submit" class="btn-primary w-full sm:w-auto">Simpan Pesan</button>
+        </div>
+
+        <form method="POST" action="{{ route('settings.welcome-message') }}">
+            @csrf
+            <div class="card-body">
+                <label class="form-label">Pesan</label>
+                <textarea name="welcome_message" rows="3" maxlength="500"
+                          class="form-control w-full"
+                          placeholder="Contoh: Selamat datang kembali! Jangan lupa catat perkembangan siswa hari ini.">{{ old('welcome_message', $setting->welcome_message) }}</textarea>
+                <p class="form-hint">Maksimal 500 karakter.</p>
+            </div>
+            <div class="card-footer flex justify-end">
+                <button type="submit" class="btn-primary w-full sm:w-auto">Simpan Pesan</button>
+            </div>
         </form>
     </div>
 
     {{-- Identitas Sekolah & Surat --}}
-    <div class="bg-white shadow rounded p-6 mt-6">
-        <h2 class="font-semibold mb-2">Identitas Sekolah &amp; Surat Pemanggilan</h2>
-        <p class="text-sm text-gray-500 mb-4">
-            Data ini dipakai untuk kop surat &amp; tanda tangan pada Surat Pemanggilan Orang Tua yang dibuat otomatis.
-        </p>
+    <div class="card">
+        <div class="card-header">
+            <span class="icon-tile bg-amber-50 text-amber-600"><x-icon name="building" /></span>
+            <div>
+                <h2 class="section-title">Identitas Sekolah &amp; Surat Pemanggilan</h2>
+                <p class="section-subtitle">
+                    Data ini dipakai untuk kop surat &amp; tanda tangan pada Surat Pemanggilan Orang Tua yang dibuat otomatis.
+                </p>
+            </div>
+        </div>
 
-        <form method="POST" action="{{ route('settings.school-identity') }}" enctype="multipart/form-data" class="space-y-4">
+        <form method="POST" action="{{ route('settings.school-identity') }}" enctype="multipart/form-data">
             @csrf
-            <div class="grid sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium mb-1">Logo Pemerintah/Kabupaten (kiri kop surat)</label>
-                    @if($setting->government_logo)
-                        <img src="{{ asset('storage/' . $setting->government_logo) }}" alt="Logo Pemerintah" class="w-16 h-16 object-contain border rounded mb-2">
-                    @endif
-                    <input type="file" name="government_logo" accept="image/*" class="w-full border rounded p-2 text-sm">
-                    <p class="text-xs text-gray-500 mt-1">Ukuran ideal: 300x300px, persegi, latar transparan (PNG), maks 1MB.</p>
+            <div class="card-body space-y-6">
+                <div class="grid sm:grid-cols-2 gap-5">
+                    <div>
+                        <label class="form-label">Logo Pemerintah/Kabupaten (kiri kop surat)</label>
+                        <div class="flex items-center gap-3">
+                            <div class="w-16 h-16 flex-shrink-0 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden">
+                                @if($setting->government_logo)
+                                    <img src="{{ asset('storage/' . $setting->government_logo) }}" alt="Logo Pemerintah" class="w-14 h-14 object-contain">
+                                @else
+                                    <x-icon name="photo" class="w-6 h-6 text-slate-300" />
+                                @endif
+                            </div>
+                            <input type="file" name="government_logo" accept="image/*" class="form-control w-full min-w-0">
+                        </div>
+                        <p class="form-hint">Ukuran ideal: 300x300px, persegi, latar transparan (PNG), maks 1MB.</p>
+                    </div>
+                    <div>
+                        <label class="form-label">Logo Sekolah (kanan kop surat)</label>
+                        <div class="flex items-center gap-3">
+                            <div class="w-16 h-16 flex-shrink-0 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden">
+                                @if($setting->school_logo)
+                                    <img src="{{ asset('storage/' . $setting->school_logo) }}" alt="Logo Sekolah" class="w-14 h-14 object-contain">
+                                @else
+                                    <x-icon name="photo" class="w-6 h-6 text-slate-300" />
+                                @endif
+                            </div>
+                            <input type="file" name="school_logo" accept="image/*" class="form-control w-full min-w-0">
+                        </div>
+                        <p class="form-hint">Ukuran ideal: 300x300px, persegi, latar transparan (PNG), maks 1MB.</p>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1">Logo Sekolah (kanan kop surat)</label>
-                    @if($setting->school_logo)
-                        <img src="{{ asset('storage/' . $setting->school_logo) }}" alt="Logo Sekolah" class="w-16 h-16 object-contain border rounded mb-2">
-                    @endif
-                    <input type="file" name="school_logo" accept="image/*" class="w-full border rounded p-2 text-sm">
-                    <p class="text-xs text-gray-500 mt-1">Ukuran ideal: 300x300px, persegi, latar transparan (PNG), maks 1MB.</p>
+
+                <div class="grid sm:grid-cols-2 gap-5 pt-6 border-t border-slate-100">
+                    <div>
+                        <label class="form-label">Baris Pemerintah <span class="font-normal text-slate-400">(opsional)</span></label>
+                        <input type="text" name="school_government_line" value="{{ old('school_government_line', $setting->school_government_line) }}"
+                               placeholder="Contoh: Pemerintah Kabupaten Bandung" class="form-control w-full">
+                    </div>
+                    <div>
+                        <label class="form-label">Nama Sekolah</label>
+                        <input type="text" name="school_name" value="{{ old('school_name', $setting->school_name) }}"
+                               placeholder="Contoh: SDIT Bahtera Nuh" class="form-control w-full">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="form-label">Alamat Sekolah</label>
+                        <input type="text" name="school_address" value="{{ old('school_address', $setting->school_address) }}"
+                               class="form-control w-full">
+                    </div>
+                    <div>
+                        <label class="form-label">Email Sekolah</label>
+                        <input type="email" name="school_email" value="{{ old('school_email', $setting->school_email) }}"
+                               class="form-control w-full">
+                    </div>
+                    <div>
+                        <label class="form-label">Kota (untuk baris tanggal surat)</label>
+                        <input type="text" name="school_city" value="{{ old('school_city', $setting->school_city) }}"
+                               placeholder="Contoh: Katapang" class="form-control w-full">
+                    </div>
                 </div>
-            </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Baris Pemerintah (opsional)</label>
-                <input type="text" name="school_government_line" value="{{ old('school_government_line', $setting->school_government_line) }}"
-                       placeholder="Contoh: Pemerintah Kabupaten Bandung" class="w-full border rounded p-2">
-            </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Nama Sekolah</label>
-                <input type="text" name="school_name" value="{{ old('school_name', $setting->school_name) }}"
-                       placeholder="Contoh: SDIT Bahtera Nuh" class="w-full border rounded p-2">
-            </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Alamat Sekolah</label>
-                <input type="text" name="school_address" value="{{ old('school_address', $setting->school_address) }}"
-                       class="w-full border rounded p-2">
-            </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Email Sekolah</label>
-                <input type="email" name="school_email" value="{{ old('school_email', $setting->school_email) }}"
-                       class="w-full border rounded p-2">
-            </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Kota (untuk baris tanggal surat)</label>
-                <input type="text" name="school_city" value="{{ old('school_city', $setting->school_city) }}"
-                       placeholder="Contoh: Katapang" class="w-full sm:w-auto border rounded p-2">
-            </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Nama Waka Kesiswaan</label>
-                <input type="text" name="waka_kesiswaan_name" value="{{ old('waka_kesiswaan_name', $setting->waka_kesiswaan_name) }}"
-                       class="w-full border rounded p-2">
-            </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Nama Kepala Sekolah</label>
-                <input type="text" name="principal_name" value="{{ old('principal_name', $setting->principal_name) }}"
-                       class="w-full border rounded p-2">
-            </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Ambang Batas Poin Pemanggilan</label>
-                <input type="number" name="summon_letter_threshold"
-                       value="{{ old('summon_letter_threshold', $setting->summon_letter_threshold ?? -100) }}"
-                       class="w-full sm:w-40 border rounded p-2" required>
-                <p class="text-xs text-gray-500 mt-1">Siswa masuk antrian saat poin turun sejumlah ini dari titik surat terakhir. Isi angka negatif, misal -100.</p>
+
+                <div class="grid sm:grid-cols-2 gap-5 pt-6 border-t border-slate-100">
+                    <div>
+                        <label class="form-label">Nama Waka Kesiswaan</label>
+                        <input type="text" name="waka_kesiswaan_name" value="{{ old('waka_kesiswaan_name', $setting->waka_kesiswaan_name) }}"
+                               class="form-control w-full">
+                    </div>
+                    <div>
+                        <label class="form-label">Nama Kepala Sekolah</label>
+                        <input type="text" name="principal_name" value="{{ old('principal_name', $setting->principal_name) }}"
+                               class="form-control w-full">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="form-label">Ambang Batas Poin Pemanggilan</label>
+                        <input type="number" name="summon_letter_threshold"
+                               value="{{ old('summon_letter_threshold', $setting->summon_letter_threshold ?? -100) }}"
+                               class="form-control w-full sm:w-40" required>
+                        <p class="form-hint">Siswa masuk antrian saat poin turun sejumlah ini dari titik surat terakhir. Isi angka negatif, misal -100.</p>
+                    </div>
+                </div>
             </div>
 
-            <button type="submit" class="btn-primary w-full sm:w-auto">Simpan Identitas Sekolah</button>
+            <div class="card-footer flex justify-end">
+                <button type="submit" class="btn-primary w-full sm:w-auto">
+                    <x-icon name="check" />
+                    Simpan Identitas Sekolah
+                </button>
+            </div>
         </form>
     </div>
 @endsection

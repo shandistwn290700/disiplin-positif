@@ -1,47 +1,48 @@
 <x-guest-layout>
-    <div class="mb-4">
-        <h2 class="font-bold text-lg text-gray-800">Ganti Password Terlebih Dahulu</h2>
-        <p class="text-sm text-gray-600 mt-1">
+    <div class="mb-6">
+        <div class="icon-tile bg-amber-50 text-amber-600 mb-4"><x-icon name="lock" /></div>
+        <h1 class="text-xl font-extrabold tracking-tight text-slate-900">Ganti Password Terlebih Dahulu</h1>
+        <p class="text-sm text-slate-500 mt-1.5">
             Demi keamanan akunmu, silakan buat password baru yang kuat sebelum melanjutkan.
         </p>
     </div>
 
     <x-validation-errors />
 
-    <form method="POST" action="{{ route('force-password.update') }}" class="space-y-4" id="change-password-form">
+    <form method="POST" action="{{ route('force-password.update') }}" class="space-y-5" id="change-password-form">
         @csrf
 
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Password Saat Ini</label>
+            <label class="form-label">Password Saat Ini</label>
             <input type="password" name="current_password" required autofocus
-                   class="w-full border-gray-300 rounded-md shadow-sm text-sm">
+                   class="form-control w-full">
         </div>
 
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Password Baru</label>
+            <label class="form-label">Password Baru</label>
             <input type="password" name="password" id="new-password" required
-                   class="w-full border-gray-300 rounded-md shadow-sm text-sm">
+                   class="form-control w-full">
 
             {{-- Indikator kekuatan password --}}
-            <div style="margin-top: 0.5rem;">
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.25rem;">
-                    <span id="strength-text" style="font-size:0.75rem; font-weight:500; color:#6b7280;">Kekuatan Password</span>
-                    <span id="strength-percent" style="font-size:0.75rem; font-weight:600; color:#6b7280;">0%</span>
+            <div class="mt-2.5">
+                <div class="flex items-center justify-between mb-1.5">
+                    <span id="strength-text" class="text-xs font-medium" style="color:#6b7280;">Kekuatan Password</span>
+                    <span id="strength-percent" class="text-xs font-semibold" style="color:#6b7280;">0%</span>
                 </div>
-                <div style="height:8px; width:100%; background-color:#e5e7eb; border-radius:9999px; overflow:hidden;">
-                    <div id="strength-bar" style="height:8px; width:0%; background-color:#e5e7eb; border-radius:9999px; transition: width 0.4s cubic-bezier(0.4,0,0.2,1), background-color 0.4s ease;"></div>
+                <div class="h-2 w-full rounded-full overflow-hidden bg-slate-200">
+                    <div id="strength-bar" class="h-2 rounded-full" style="width:0%; background-color:#e5e7eb; transition: width 0.4s cubic-bezier(0.4,0,0.2,1), background-color 0.4s ease;"></div>
                 </div>
-                <p id="strength-label" style="font-size:0.75rem; color:#6b7280; margin-top:0.25rem;">Minimal 8 karakter, kombinasi huruf besar, kecil, angka, dan simbol.</p>
+                <p id="strength-label" class="form-hint" style="color:#6b7280;">Minimal 8 karakter, kombinasi huruf besar, kecil, angka, dan simbol.</p>
             </div>
         </div>
 
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password Baru</label>
+            <label class="form-label">Konfirmasi Password Baru</label>
             <input type="password" name="password_confirmation" required
-                   class="w-full border-gray-300 rounded-md shadow-sm text-sm">
+                   class="form-control w-full">
         </div>
 
-        <button type="submit" class="btn-primary w-full justify-center" style="display:inline-flex; background-color:#1d4ed8; color:#fff; font-weight:600; padding:0.625rem 1.5rem; border-radius:0.6rem;">
+        <button type="submit" class="btn-primary w-full !py-3">
             Simpan Password Baru
         </button>
     </form>

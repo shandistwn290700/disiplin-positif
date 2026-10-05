@@ -5,183 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Formulir Disiplin Positif</title>
     @include('partials.favicon')
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    @include('partials.theme')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Figtree', 'sans-serif'] } } } };
-    </script>
 
     <style>
-        body { font-family: 'Figtree', sans-serif; }
-
-        /* Tombol */
-        .btn-primary {
-            display: inline-flex; align-items: center; justify-content: center;
-            background-color: #1d4ed8; color: #fff; font-weight: 600;
-            padding: 0.625rem 1.5rem; border-radius: 0.6rem;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-            transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
-        }
-        .btn-primary:hover { background-color: #1e40af; box-shadow: 0 4px 10px rgba(29,78,216,0.25); }
-        .btn-primary:active { transform: scale(0.97); }
-
-        .btn-secondary {
-            display: inline-flex; align-items: center; justify-content: center;
-            background-color: #fff; color: #374151; font-weight: 600;
-            padding: 0.625rem 1.5rem; border-radius: 0.6rem;
-            border: 1px solid #d1d5db;
-            transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
-        }
-        .btn-secondary:hover { background-color: #f9fafb; border-color: #9ca3af; }
-        .btn-secondary:active { transform: scale(0.97); }
-
-        .btn-sm { padding: 0.5rem 1.1rem; font-size: 0.875rem; border-radius: 0.5rem; }
-
-        .btn-pill {
-            display: inline-block; font-size: 0.75rem; font-weight: 600;
-            padding: 0.3rem 0.75rem; border-radius: 9999px;
-            transition: background-color 0.15s ease, transform 0.1s ease;
-        }
-        .btn-pill:active { transform: scale(0.95); }
-        .btn-pill-blue { background-color: #eff6ff; color: #1d4ed8; }
-        .btn-pill-blue:hover { background-color: #dbeafe; }
-        .btn-pill-red { background-color: #fef2f2; color: #dc2626; }
-        .btn-pill-red:hover { background-color: #fee2e2; }
-
-        /* Tabel fresh */
-        .table-fresh {
-            width: 100%; background: #fff; border-radius: 0.85rem; overflow: hidden;
-            border: 1px solid #eef0f3; box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-            border-collapse: separate; border-spacing: 0; font-size: 0.875rem;
-        }
-        .table-fresh thead { background-color: #f8fafc; }
-        .table-fresh th {
-            text-align: left; padding: 0.85rem 1.1rem; font-size: 0.7rem; font-weight: 700;
-            letter-spacing: 0.04em; text-transform: uppercase; color: #64748b;
-            border-bottom: 1px solid #eef0f3;
-        }
-        .table-fresh td { padding: 0.9rem 1.1rem; color: #1e293b; }
-        .table-fresh tbody tr { border-top: 1px solid #f1f5f9; transition: background-color 0.1s ease; }
-        .table-fresh tbody tr:first-child { border-top: none; }
-        .table-fresh tbody tr:hover { background-color: #f8fafc; }
-
-        .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-
         /* Sidebar */
-        .sidebar-link {
-            display: flex; align-items: center; gap: 0.7rem;
-            padding: 0.6rem 0.9rem; border-radius: 0.6rem; font-size: 0.875rem; font-weight: 500;
-            color: #475569; transition: background-color 0.12s ease, color 0.12s ease;
+        .sidebar { background: #fff; border-right: 1px solid var(--line); }
+        .sidebar-section { padding: 1rem 0.9rem 0.4rem; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--subtle); }
+        .sidebar-link, .sidebar-group-label {
+            display: flex; align-items: center; gap: 0.75rem; width: 100%;
+            padding: 0.6rem 0.8rem; border-radius: 0.7rem; font-size: 0.875rem; font-weight: 500;
+            color: #475569; transition: background-color .12s ease, color .12s ease;
         }
-        .sidebar-link:hover { background-color: #eff6ff; color: #1d4ed8; }
-        .sidebar-link.active { background-color: #1d4ed8; color: #fff; }
-        .sidebar-link svg { width: 1.15rem; height: 1.15rem; flex-shrink: 0; }
-
-        .sidebar-group-label {
-            display: flex; align-items: center; justify-content: space-between; cursor: pointer;
-            padding: 0.6rem 0.9rem; border-radius: 0.6rem; font-size: 0.875rem; font-weight: 500;
-            color: #475569; transition: background-color 0.12s ease;
+        .sidebar-link svg, .sidebar-group-label svg { width: 1.2rem; height: 1.2rem; flex-shrink: 0; color: #94a3b8; transition: color .12s ease; }
+        .sidebar-link:hover, .sidebar-group-label:hover { background-color: #f4f7fb; color: var(--ink); }
+        .sidebar-link:hover svg, .sidebar-group-label:hover svg { color: var(--brand-600); }
+        .sidebar-link.active {
+            color: #fff; background: linear-gradient(135deg, var(--brand-600), var(--brand-700));
+            box-shadow: 0 8px 18px -8px rgba(29, 78, 216, .6);
         }
-        .sidebar-group-label:hover { background-color: #f1f5f9; }
-        .sidebar-submenu { overflow: hidden; max-height: 0; transition: max-height 0.2s ease; }
-        .sidebar-submenu.open { max-height: 200px; }
+        .sidebar-link.active svg { color: #fff; }
+        .sidebar-group-label { cursor: pointer; justify-content: space-between; }
+        .sidebar-group-label.has-active { color: var(--brand-700); }
+        .sidebar-group-label.has-active > span svg { color: var(--brand-600); }
+        .sidebar-submenu { overflow: hidden; max-height: 0; transition: max-height .25s ease; }
+        .sidebar-submenu.open { max-height: 320px; }
+        .sidebar-submenu-inner { margin: 0.2rem 0 0.35rem 1.4rem; padding-left: 0.85rem; border-left: 1px solid var(--line); }
         .sidebar-submenu a {
-            display: block; padding: 0.5rem 0.9rem 0.5rem 2.6rem; font-size: 0.825rem;
-            color: #64748b; border-radius: 0.5rem;
+            position: relative; display: block; padding: 0.45rem 0.75rem; margin: 0.1rem 0;
+            font-size: 0.8125rem; font-weight: 500; color: var(--muted); border-radius: 0.55rem;
+            transition: background-color .12s ease, color .12s ease;
         }
-        .sidebar-submenu a:hover { background-color: #eff6ff; color: #1d4ed8; }
-        .sidebar-submenu a.active { color: #1d4ed8; font-weight: 600; }
-
-        .chevron { transition: transform 0.2s ease; }
+        .sidebar-submenu a:hover { background-color: #f4f7fb; color: var(--ink); }
+        .sidebar-submenu a.active { color: var(--brand-700); font-weight: 600; background-color: var(--brand-50); }
+        .sidebar-submenu a.active::before {
+            content: ''; position: absolute; left: calc(-0.85rem - 1px); top: 0.45rem; bottom: 0.45rem;
+            width: 2px; border-radius: 2px; background: var(--brand-600);
+        }
+        .chevron { width: 1rem !important; height: 1rem !important; transition: transform .2s ease; }
         .chevron.rotated { transform: rotate(90deg); }
+
+        .topbar { background: rgba(245, 247, 251, 0.82); backdrop-filter: saturate(180%) blur(10px); -webkit-backdrop-filter: saturate(180%) blur(10px); border-bottom: 1px solid rgba(230, 234, 241, .8); }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 overflow-x-hidden">
+<body class="text-slate-700 overflow-x-hidden" style="background: var(--bg)">
+    @php
+        $authUser = auth()->user();
+        $siteSetting = \App\Models\SiteSetting::current();
+        $userInitials = collect(preg_split('/\s+/', trim($authUser->name)))
+            ->filter()->take(2)
+            ->map(fn ($word) => mb_strtoupper(mb_substr($word, 0, 1)))
+            ->implode('');
+        $userRoleLabel = $authUser->isAdmin() ? 'Administrator' : 'Guru' . ($authUser->schoolClass ? ' · ' . $authUser->schoolClass->name : '');
 
-    <div id="page-loader" class="fixed inset-0 z-50 flex items-center justify-center bg-white transition-opacity duration-300">
-        <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        $administrasiOpen = request()->routeIs('students.*') || request()->routeIs('classes.*');
+        $pencatatanOpen = request()->routeIs('records.*') || request()->routeIs('reports.*') || request()->routeIs('summon.*');
+        $pengaturanOpen = request()->routeIs('settings.*') || request()->routeIs('categories.*');
+    @endphp
+
+    <div id="page-loader" class="fixed inset-0 z-[60] flex items-center justify-center transition-opacity duration-300" style="background: var(--bg)">
+        <div class="flex flex-col items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center shadow-lg shadow-brand-600/30 animate-pulse">
+                <x-icon name="shield" class="w-6 h-6" />
+            </div>
+            <div class="w-24 h-1 rounded-full bg-brand-100 overflow-hidden">
+                <div class="h-full w-1/2 rounded-full bg-brand-600 animate-[loader_1s_ease-in-out_infinite]"></div>
+            </div>
+        </div>
+        <style>@keyframes loader { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }</style>
     </div>
 
-    <div class="flex min-h-screen">
+    <div class="min-h-screen">
         {{-- Sidebar --}}
-        <aside id="sidebar" class="w-64 bg-white border-r border-gray-100 flex-shrink-0 flex flex-col fixed inset-y-0 left-0 z-40 -translate-x-full lg:translate-x-0 transition-transform duration-200">
-            <div class="px-5 py-5 border-b border-gray-100">
-                <span class="font-bold text-lg text-brand-800" style="color:#1e3a8a">Disiplin Positif</span>
+        <aside id="sidebar" class="sidebar w-[17rem] flex flex-col fixed inset-y-0 left-0 z-40 -translate-x-full lg:translate-x-0 transition-transform duration-200">
+            <div class="px-5 h-[4.25rem] flex items-center gap-3 border-b border-slate-100">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center shadow-md shadow-brand-600/25">
+                    <x-icon name="shield" class="w-5 h-5" />
+                </div>
+                <div class="min-w-0">
+                    <p class="font-extrabold text-[0.95rem] leading-tight text-slate-900 tracking-tight">Disiplin Positif</p>
+                    <p class="text-[0.7rem] text-slate-400 truncate">{{ $siteSetting->school_name ?: 'Sistem Pencatatan Disiplin' }}</p>
+                </div>
+                <button type="button" onclick="toggleSidebar()" class="ml-auto lg:hidden p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600" aria-label="Tutup menu">
+                    <x-icon name="x" class="w-5 h-5" />
+                </button>
             </div>
 
-            <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <nav class="flex-1 overflow-y-auto px-3 pb-4 space-y-0.5">
+                <p class="sidebar-section">Menu Utama</p>
+
                 <a href="{{ route('dashboard') }}" class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13h4v8H3v-8zM10 3h4v18h-4V3zM17 8h4v13h-4V8z"/></svg>
+                    <x-icon name="grid" />
                     Dashboard
                 </a>
 
-                @if(auth()->user()->isAdmin())
+                @if($authUser->isAdmin())
                     <div>
-                        <div class="sidebar-group-label" onclick="toggleGroup('grp-administrasi')">
-                            <span class="flex items-center gap-2">
-                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1"/></svg>
+                        <button type="button" class="sidebar-group-label {{ $administrasiOpen ? 'has-active' : '' }}" onclick="toggleGroup('grp-administrasi')">
+                            <span class="flex items-center gap-3">
+                                <x-icon name="library" />
                                 Administrasi
                             </span>
-                            <svg id="chev-grp-administrasi" class="chevron w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-                        </div>
-                        <div id="grp-administrasi" class="sidebar-submenu {{ request()->routeIs('students.*') || request()->routeIs('classes.*') ? 'open' : '' }}">
-                            <a href="{{ route('students.index') }}" class="{{ request()->routeIs('students.*') ? 'active' : '' }}">Data Siswa</a>
-                            <a href="{{ route('classes.index') }}" class="{{ request()->routeIs('classes.*') ? 'active' : '' }}">Kelas</a>
+                            <svg id="chev-grp-administrasi" class="chevron {{ $administrasiOpen ? 'rotated' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+                        </button>
+                        <div id="grp-administrasi" class="sidebar-submenu {{ $administrasiOpen ? 'open' : '' }}">
+                            <div class="sidebar-submenu-inner">
+                                <a href="{{ route('students.index') }}" class="{{ request()->routeIs('students.*') ? 'active' : '' }}">Data Siswa</a>
+                                <a href="{{ route('classes.index') }}" class="{{ request()->routeIs('classes.*') ? 'active' : '' }}">Kelas</a>
+                            </div>
                         </div>
                     </div>
                 @else
                     {{-- Guru: hanya boleh lihat & cari data siswa di kelasnya sendiri, tanpa kelola kelas --}}
                     <a href="{{ route('students.index') }}" class="sidebar-link {{ request()->routeIs('students.*') ? 'active' : '' }}">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1"/></svg>
+                        <x-icon name="academic" />
                         Data Siswa
                     </a>
                 @endif
 
                 <div>
-                    <div class="sidebar-group-label" onclick="toggleGroup('grp-pencatatan')">
-                        <span class="flex items-center gap-2">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.4-9.4a2 2 0 112.8 2.8L11 19l-4 1 1-4 9.6-9.6z"/></svg>
+                    <button type="button" class="sidebar-group-label {{ $pencatatanOpen ? 'has-active' : '' }}" onclick="toggleGroup('grp-pencatatan')">
+                        <span class="flex items-center gap-3">
+                            <x-icon name="clipboard" />
                             Pencatatan
                         </span>
-                        <svg id="chev-grp-pencatatan" class="chevron w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-                    </div>
-                    <div id="grp-pencatatan" class="sidebar-submenu {{ request()->routeIs('records.*') || request()->routeIs('reports.*') || request()->routeIs('summon.*') ? 'open' : '' }}">
-                        <a href="{{ route('records.create') }}" class="{{ request()->routeIs('records.create') ? 'active' : '' }}">Catat Perilaku</a>
-                        <a href="{{ route('records.index') }}" class="{{ request()->routeIs('records.index') ? 'active' : '' }}">Riwayat Catatan</a>
-                        <a href="{{ route('reports.index') }}" class="{{ request()->routeIs('reports.*') ? 'active' : '' }}">Poin Siswa</a>
-                        <a href="{{ route('summon.index') }}" class="{{ request()->routeIs('summon.*') ? 'active' : '' }}">Pemanggilan</a>
+                        <svg id="chev-grp-pencatatan" class="chevron {{ $pencatatanOpen ? 'rotated' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+                    </button>
+                    <div id="grp-pencatatan" class="sidebar-submenu {{ $pencatatanOpen ? 'open' : '' }}">
+                        <div class="sidebar-submenu-inner">
+                            <a href="{{ route('records.create') }}" class="{{ request()->routeIs('records.create') ? 'active' : '' }}">Catat Perilaku</a>
+                            <a href="{{ route('records.index') }}" class="{{ request()->routeIs('records.index') ? 'active' : '' }}">Riwayat Catatan</a>
+                            <a href="{{ route('reports.index') }}" class="{{ request()->routeIs('reports.*') ? 'active' : '' }}">Poin Siswa</a>
+                            <a href="{{ route('summon.index') }}" class="{{ request()->routeIs('summon.*') ? 'active' : '' }}">Pemanggilan</a>
+                        </div>
                     </div>
                 </div>
 
-                @if(auth()->user()->isAdmin())
+                @if($authUser->isAdmin())
+                    <p class="sidebar-section">Admin</p>
+
                     <a href="{{ route('users.index') }}" class="sidebar-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4m4 4a4 4 0 100-4m0 4v6m-6-2a4 4 0 018 0"/></svg>
+                        <x-icon name="users" />
                         Kelola Akun
                     </a>
 
                     <div>
-                        <div class="sidebar-group-label" onclick="toggleGroup('grp-pengaturan')">
-                            <span class="flex items-center gap-2">
-                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>
+                        <button type="button" class="sidebar-group-label {{ $pengaturanOpen ? 'has-active' : '' }}" onclick="toggleGroup('grp-pengaturan')">
+                            <span class="flex items-center gap-3">
+                                <x-icon name="cog" />
                                 Pengaturan
                             </span>
-                            <svg id="chev-grp-pengaturan" class="chevron w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-                        </div>
-                        <div id="grp-pengaturan" class="sidebar-submenu {{ request()->routeIs('settings.*') || request()->routeIs('categories.*') ? 'open' : '' }}">
-                            <a href="{{ route('settings.edit') }}" class="{{ request()->routeIs('settings.*') ? 'active' : '' }}">Tampilan</a>
-                            <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories.*') ? 'active' : '' }}">Kategori</a>
+                            <svg id="chev-grp-pengaturan" class="chevron {{ $pengaturanOpen ? 'rotated' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+                        </button>
+                        <div id="grp-pengaturan" class="sidebar-submenu {{ $pengaturanOpen ? 'open' : '' }}">
+                            <div class="sidebar-submenu-inner">
+                                <a href="{{ route('settings.edit') }}" class="{{ request()->routeIs('settings.*') ? 'active' : '' }}">Tampilan</a>
+                                <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories.*') ? 'active' : '' }}">Kategori</a>
+                            </div>
                         </div>
                     </div>
                 @endif
             </nav>
 
-            <div class="px-3 py-4 border-t border-gray-100">
+            <div class="p-3 border-t border-slate-100 space-y-1">
+                <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition {{ request()->routeIs('profile.*') ? 'bg-brand-50' : '' }}">
+                    <span class="avatar">{{ $userInitials }}</span>
+                    <span class="min-w-0">
+                        <span class="block text-sm font-semibold text-slate-800 truncate">{{ $authUser->name }}</span>
+                        <span class="block text-xs text-slate-400 truncate">{{ $userRoleLabel }}</span>
+                    </span>
+                </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="sidebar-link w-full text-left" style="color:#dc2626">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    <button type="submit" class="sidebar-link !text-red-600 hover:!bg-red-50">
+                        <x-icon name="logout" class="!text-red-500" />
                         Keluar
                     </button>
                 </form>
@@ -189,21 +186,39 @@
         </aside>
 
         {{-- Overlay untuk mobile saat sidebar terbuka --}}
-        <div id="sidebar-overlay" class="fixed inset-0 bg-black/30 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
+        <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
 
         {{-- Konten utama --}}
-        <div class="flex-1 lg:ml-64 flex flex-col min-w-0">
-            {{-- Topbar mobile --}}
-            <div class="lg:hidden bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3">
-                <button onclick="toggleSidebar()" class="text-gray-600">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <div class="lg:pl-[17rem] flex flex-col min-h-screen min-w-0">
+            {{-- Topbar --}}
+            <header class="topbar sticky top-0 z-20 h-[4.25rem] px-4 sm:px-6 lg:px-8 flex items-center gap-3">
+                <button type="button" onclick="toggleSidebar()" class="lg:hidden -ml-1 p-2 rounded-lg text-slate-600 hover:bg-white" aria-label="Buka menu">
+                    <x-icon name="menu" class="w-6 h-6" />
                 </button>
-                <span class="font-bold text-brand-800" style="color:#1e3a8a">Disiplin Positif</span>
-            </div>
+                <span class="lg:hidden font-extrabold text-slate-900 tracking-tight">Disiplin Positif</span>
 
-            <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6">
-                @yield('content')
+                <div class="ml-auto flex items-center gap-3">
+                    <span class="hidden sm:inline-flex items-center gap-2 text-sm text-slate-500 bg-white border border-slate-200/80 rounded-full px-3.5 py-1.5">
+                        <x-icon name="calendar" class="w-4 h-4 text-slate-400" />
+                        {{ now()->locale('id')->translatedFormat('l, d F Y') }}
+                    </span>
+                    <a href="{{ route('profile.edit') }}" class="avatar ring-2 ring-white shadow-sm hover:ring-brand-100 transition" title="Profil {{ $authUser->name }}">
+                        {{ $userInitials }}
+                    </a>
+                </div>
+            </header>
+
+            <main class="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+                @hasSection('content')
+                    @yield('content')
+                @else
+                    {{ $slot ?? '' }}
+                @endif
             </main>
+
+            <footer class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-6 text-xs text-slate-400">
+                &copy; {{ date('Y') }} Disiplin Positif{{ $siteSetting->school_name ? ' — ' . $siteSetting->school_name : '' }}
+            </footer>
         </div>
     </div>
 
@@ -226,8 +241,8 @@
         function confirmDelete(form, message) {
             Swal.fire({
                 title: 'Yakin?', text: message || 'Data ini akan dihapus secara permanen.', icon: 'warning',
-                showCancelButton: true, confirmButtonColor: '#dc2626', cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Ya, hapus', cancelButtonText: 'Batal',
+                showCancelButton: true, confirmButtonColor: '#dc2626', cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, hapus', cancelButtonText: 'Batal', reverseButtons: true,
             }).then((result) => { if (result.isConfirmed) form.submit(); });
             return false;
         }
@@ -241,8 +256,8 @@
 
         @if(session('just_logged_in'))
             Swal.fire({
-                title: 'Selamat datang, {{ auth()->user()->name }}!',
-                text: @json(\App\Models\SiteSetting::current()->welcome_message ?: 'Senang bertemu lagi. Yuk mulai catat perkembangan siswa hari ini.'),
+                title: 'Selamat datang, {{ $authUser->name }}!',
+                text: @json($siteSetting->welcome_message ?: 'Senang bertemu lagi. Yuk mulai catat perkembangan siswa hari ini.'),
                 icon: 'success',
                 confirmButtonText: 'Mulai',
                 confirmButtonColor: '#1d4ed8',

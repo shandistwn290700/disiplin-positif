@@ -1,20 +1,28 @@
 @extends('layouts.main')
 
 @section('content')
-    <h1 class="text-xl font-bold mb-4">Ubah Kelas</h1>
+    <x-page-header title="Ubah Kelas" :subtitle="$class->name" :back="route('classes.index')" />
 
-    <x-validation-errors />
+    <div class="max-w-2xl">
+        <x-validation-errors />
 
-    <form method="POST" action="{{ route('classes.update', $class) }}" class="bg-white shadow rounded p-6 space-y-4">
-        @csrf
-        @method('PUT')
+        <form method="POST" action="{{ route('classes.update', $class) }}" class="card">
+            @csrf
+            @method('PUT')
 
-        <div>
-            <label class="block text-sm font-medium mb-1">Nama Kelas</label>
-            <input type="text" name="name" value="{{ old('name', $class->name) }}"
-                   class="w-full border rounded p-2" required>
-        </div>
+            <div class="card-body">
+                <label class="form-label">Nama Kelas</label>
+                <input type="text" name="name" value="{{ old('name', $class->name) }}"
+                       class="form-control w-full" required>
+            </div>
 
-        <button type="submit" class="btn-primary w-full sm:w-auto">Simpan Perubahan</button>
-    </form>
+            <div class="card-footer flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+                <a href="{{ route('classes.index') }}" class="btn-secondary w-full sm:w-auto">Batal</a>
+                <button type="submit" class="btn-primary w-full sm:w-auto">
+                    <x-icon name="check" />
+                    Simpan Perubahan
+                </button>
+            </div>
+        </form>
+    </div>
 @endsection
